@@ -52,7 +52,7 @@ def _duplicates(items):
 def _is_valid_assessment_sequence(assessments):
     """
     Check whether the sequence of assessments is valid. The rules enforced are:
-        -must have one of staff-, peer-, or self- listed
+        -must have one of staff-, peer-, self-, or AI assessment listed
         -in addition to those, only student-training is a valid entry
         -no duplicate entries
         -if staff-assessment is present, it must come last
@@ -66,7 +66,7 @@ def _is_valid_assessment_sequence(assessments):
 
     """
     sequence = [asmnt.get('name') for asmnt in assessments]
-    required = ['staff-assessment', 'peer-assessment', 'self-assessment']
+    required = ['staff-assessment', 'peer-assessment', 'self-assessment', 'ai-assessment']
     optional = ['student-training']
 
     # at least one of required?

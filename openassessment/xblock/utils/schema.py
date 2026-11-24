@@ -87,6 +87,7 @@ VALID_ASSESSMENT_TYPES = [
     'peer-assessment',
     'self-assessment',
     'student-training',
+    'ai-assessment',
     'staff-assessment',
 ]
 

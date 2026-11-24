@@ -3,6 +3,7 @@ from openassessment.xblock.apis.grades_api import GradesAPI
 from openassessment.xblock.apis.ora_config_api import ORAConfigAPI
 from openassessment.xblock.apis.submissions.submissions_api import SubmissionAPI
 from openassessment.xblock.apis.assessments.peer_assessment_api import PeerAssessmentAPI
+from openassessment.xblock.apis.assessments.ai_assessment_api import AIAssessmentAPI
 from openassessment.xblock.apis.assessments.self_assessment_api import SelfAssessmentAPI
 from openassessment.xblock.apis.assessments.staff_assessment_api import (
     StaffAssessmentAPI,
@@ -35,6 +36,10 @@ class ORADataAccessor:
     @property
     def self_assessment_data(self):
         return SelfAssessmentAPI(self._block)
+
+    @property
+    def ai_assessment_data(self):
+        return AIAssessmentAPI(self._block)
 
     @property
     def staff_assessment_data(self):

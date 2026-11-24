@@ -144,6 +144,10 @@ DEFAULT_SELF_ASSESSMENT = {
     "due": DEFAULT_DUE,
 }
 
+DEFAULT_AI_ASSESSMENT = {
+    "name": "ai-assessment",
+}
+
 DEFAULT_STAFF_ASSESSMENT = {
     "name": "staff-assessment",
     "start": DEFAULT_START,
@@ -169,6 +173,7 @@ DEFAULT_EDITOR_ASSESSMENTS_ORDER = [
     "student-training",
     "peer-assessment",
     "self-assessment",
+    "ai-assessment",
     "staff-assessment",
 ]
 
@@ -183,6 +188,10 @@ PEER_ASSESSMENT_MODULES = [
 
 STAFF_ASSESSMENT_MODULES = [
     ACTIVE_STAFF_ASSESSMENT,
+]
+
+AI_ASSESSMENT_MODULES = [
+    DEFAULT_AI_ASSESSMENT,
 ]
 
 SELF_TO_PEER_ASSESSMENT_MODULES = [

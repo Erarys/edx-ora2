@@ -3,6 +3,7 @@ APIs for getting grade info
 """
 
 from openassessment.assessment.api import peer as peer_api
+from openassessment.assessment.api import ai as ai_api
 from openassessment.assessment.api import self as self_api
 from openassessment.assessment.api import staff as staff_api
 
@@ -40,19 +41,33 @@ class GradesAPI:
 
         This follows the order:
         1) Staff (if assessment received / overridden)
-        2) Peer (if assessment step configured)
-        3) Self (if assessment step configured)
+        2) AI (if assessment step configured)
+        3) Peer (if assessment step configured)
+        4) Self (if assessment step configured)
 
         NOTE: The logic in a few places differs, but this combines the best I've found.
         """
         if self.staff_score is not None or self.score_overridden:
             return "staff"
+        elif "ai-assessment" in self._block.assessment_steps:
+            return "ai"
         elif "peer-assessment" in self._block.assessment_steps:
             return "peer"
         elif "self-assessment" in self._block.assessment_steps:
             return "self"
 
         # To make pylint happy
+        return None
+
+    @property
+    def ai_score(self):
+        """Get the AI assessment score."""
+        assessment = ai_api.get_latest_assessment(self._get_submission_uuid())
+        if assessment is not None:
+            return {
+                "points_earned": assessment["points_earned"],
+                "points_possible": assessment["points_possible"],
+            }
         return None
 
     @property

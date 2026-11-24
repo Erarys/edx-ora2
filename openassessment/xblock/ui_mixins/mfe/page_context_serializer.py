@@ -353,7 +353,7 @@ class PageDataSerializer(Serializer):
             return SubmissionSerializer(learner_submission_data).data
 
         # Steps without a necessary response
-        if requested_step in ("staff"):
+        if requested_step in ("ai", "staff"):
             return {}
         return None
 

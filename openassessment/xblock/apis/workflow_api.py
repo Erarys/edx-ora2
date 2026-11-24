@@ -155,6 +155,10 @@ class WorkflowAPI:
         return self.status == "peer"
 
     @property
+    def is_ai(self):
+        return self.status == "ai"
+
+    @property
     def submission_uuid(self):
         return self._block.submission_uuid
 
@@ -220,6 +224,7 @@ class WorkflowStep:
     _assessment_module_mappings = {
         "peer-assessment": Step.PEER,
         "student-training": Step.STUDENT_TRAINING,
+        "ai-assessment": Step.AI,
         "staff-assessment": Step.STAFF,
         "self-assessment": Step.SELF,
     }
@@ -227,6 +232,7 @@ class WorkflowStep:
     _workflow_step_mappings = {
         "submission": Step.SUBMISSION,
         "training": Step.STUDENT_TRAINING,
+        "ai": Step.AI,
         "peer": Step.PEER,
         "self": Step.SELF,
         "staff": Step.STAFF,

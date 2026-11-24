@@ -60,6 +60,7 @@ MFE_STEP_TO_WORKFLOW_MAPPINGS = {
     "studentTraining": "training",
     "peer": "peer",
     "self": "self",
+    "ai": "ai",
     "staff": "staff",
     "done": "done",
 }
@@ -135,6 +136,8 @@ class MfeMixin:
             step_data = self.peer_assessment_data()
         elif step_name == "self":
             step_data = self.self_assessment_data
+        elif step_name == "ai":
+            return True
         elif step_name == "staff":
             step_data = self.staff_assessment_data
         else:

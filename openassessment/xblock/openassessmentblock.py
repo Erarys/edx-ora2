@@ -66,6 +66,7 @@ from openassessment.xblock.utils.xml import parse_from_xml, serialize_content_to
 from openassessment.xblock.apis.ora_config_api import ORAConfigAPI
 from openassessment.xblock.apis.workflow_api import WorkflowAPI
 from openassessment.xblock.apis.assessments.peer_assessment_api import PeerAssessmentAPI
+from openassessment.xblock.apis.assessments.ai_assessment_api import AIAssessmentAPI
 from openassessment.xblock.apis.assessments.self_assessment_api import SelfAssessmentAPI
 from openassessment.xblock.apis.assessments.staff_assessment_api import StaffAssessmentAPI
 from openassessment.xblock.apis.assessments.student_training_api import StudentTrainingAPI
@@ -112,6 +113,7 @@ class OpenAssessmentBlock(
         "student-training",
         "peer-assessment",
         "self-assessment",
+        "ai-assessment",
         "staff-assessment"
     ]
 
@@ -324,6 +326,10 @@ class OpenAssessmentBlock(
 
     def peer_assessment_data(self, continue_grading=False):
         return PeerAssessmentAPI(self, continue_grading)
+
+    @property
+    def ai_assessment_data(self):
+        return AIAssessmentAPI(self)
 
     @property
     def self_assessment_data(self):

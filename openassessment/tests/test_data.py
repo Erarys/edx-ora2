@@ -918,6 +918,8 @@ class TestOraAggregateDataIntegration(TransactionCacheResetTest):
             'block_name',
             'student_id',
             'status',
+            'is_ai_complete',
+            'is_ai_graded',
             'is_peer_complete',
             'is_peer_graded',
             'is_self_complete',
@@ -941,6 +943,8 @@ class TestOraAggregateDataIntegration(TransactionCacheResetTest):
             ITEM_ID,
             SCORER_ID,
             'peer',
+            '',
+            '',
             0,
             0,
             '',
@@ -961,6 +965,8 @@ class TestOraAggregateDataIntegration(TransactionCacheResetTest):
             ITEM_ID,
             STUDENT_ID,
             'done',
+            '',
+            '',
             1,
             1,
             '',
@@ -1047,22 +1053,22 @@ class TestOraAggregateDataIntegration(TransactionCacheResetTest):
         self.assertIn(item_id3, data)
         self.assertIn(team_item_id, data)
         for item in [ITEM_ID, item_id2, item_id3, team_item_id]:
-            self.assertEqual({'total', 'training', 'peer', 'self', 'staff', 'waiting', 'done', 'cancelled', 'teams'},
+            self.assertEqual({'total', 'training', 'ai', 'peer', 'self', 'staff', 'waiting', 'done', 'cancelled', 'teams'},
                              set(data[item].keys()))
         self.assertEqual(data[ITEM_ID], {
-            'total': 2, 'training': 0, 'peer': 1, 'self': 0, 'staff': 0, 'waiting': 0,
+            'total': 2, 'training': 0, 'ai': 0, 'peer': 1, 'self': 0, 'staff': 0, 'waiting': 0,
             'done': 1, 'cancelled': 0, 'teams': 0
         })
         self.assertEqual(data[item_id2], {
-            'total': 2, 'training': 0, 'peer': 1, 'self': 1, 'staff': 0, 'waiting': 0,
+            'total': 2, 'training': 0, 'ai': 0, 'peer': 1, 'self': 1, 'staff': 0, 'waiting': 0,
             'done': 0, 'cancelled': 0, 'teams': 0
         })
         self.assertEqual(data[item_id3], {
-            'total': 3, 'training': 0, 'peer': 1, 'self': 2, 'staff': 0, 'waiting': 0,
+            'total': 3, 'training': 0, 'ai': 0, 'peer': 1, 'self': 2, 'staff': 0, 'waiting': 0,
             'done': 0, 'cancelled': 0, 'teams': 0
         })
         self.assertEqual(data[team_item_id], {
-            'total': 2, 'training': 0, 'peer': 0, 'self': 0, 'staff': 0, 'waiting': 2,
+            'total': 2, 'training': 0, 'ai': 0, 'peer': 0, 'self': 0, 'staff': 0, 'waiting': 2,
             'done': 0, 'cancelled': 0, 'teams': 0
         })
 

@@ -39,6 +39,7 @@ logger = logging.getLogger('openassessment.workflow.models')  # pylint: disable=
 # that implements the corresponding assessment API.
 # For backwards compatibility, we provide a default configuration as well
 DEFAULT_ASSESSMENT_API_DICT = {
+    'ai': 'openassessment.assessment.api.ai',
     'peer': 'openassessment.assessment.api.peer',
     'self': 'openassessment.assessment.api.self',
     'training': 'openassessment.assessment.api.student_training',
@@ -88,7 +89,7 @@ class AssessmentWorkflow(TimeStampedModel, StatusModel):
     # We then use that score as the student's overall score.
     # This Django setting is a list of assessment steps (defined in `settings.ORA2_ASSESSMENTS`)
     # in descending priority order.
-    DEFAULT_ASSESSMENT_SCORE_PRIORITY = ['peer', 'self']  # pylint: disable=invalid-name
+    DEFAULT_ASSESSMENT_SCORE_PRIORITY = ['ai', 'peer', 'self']  # pylint: disable=invalid-name
     ASSESSMENT_SCORE_PRIORITY = getattr(
         settings, 'ORA2_ASSESSMENT_SCORE_PRIORITY',
         DEFAULT_ASSESSMENT_SCORE_PRIORITY
