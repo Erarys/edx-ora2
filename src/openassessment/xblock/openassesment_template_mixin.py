@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 from web_fragments.fragment import Fragment
 
 from openassessment.xblock.utils.defaults import (
+    AI_ASSESSMENT_MODULES,
     PEER_ASSESSMENT_MODULES,
     SELF_ASSESSMENT_MODULES,
     SELF_TO_PEER_ASSESSMENT_MODULES,
@@ -66,6 +67,7 @@ class OpenAssessmentTemplatesMixin:
         "peer-assessment": _("Peer Assessment Only"),
         "self-assessment": _("Self Assessment Only"),
         "staff-assessment": _("Staff Assessment Only"),
+        "ai-assessment": _("AI Assessment Only"),
         "self-to-peer": _("Self Assessment to Peer Assessment"),
         "self-to-staff": _("Self Assessment to Staff Assessment")
     }
@@ -74,6 +76,7 @@ class OpenAssessmentTemplatesMixin:
         "self-assessment": SELF_ASSESSMENT_MODULES,
         "peer-assessment": PEER_ASSESSMENT_MODULES,
         "staff-assessment": STAFF_ASSESSMENT_MODULES,
+        "ai-assessment": AI_ASSESSMENT_MODULES,
         "self-to-peer": SELF_TO_PEER_ASSESSMENT_MODULES,
         "self-to-staff": SELF_TO_STAFF_ASSESSMENT_MODULES,
     }

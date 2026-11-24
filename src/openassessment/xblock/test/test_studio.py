@@ -121,6 +121,7 @@ class StudioViewTest(XBlockHandlerTestCase):
         "peer-assessment": "oa_peer_assessment_editor",
         "self-assessment": "oa_self_assessment_editor",
         "student-training": "oa_student_training_editor",
+        "ai-assessment": "oa_ai_assessment_editor",
         "staff-assessment": "oa_staff_assessment_editor",
     }
 
@@ -193,6 +194,7 @@ class StudioViewTest(XBlockHandlerTestCase):
             "student-training",
             "peer-assessment",
             "self-assessment",
+            "ai-assessment",
             "staff-assessment",
         ]
         xblock.runtime.modulestore = MagicMock()
@@ -303,6 +305,7 @@ class StudioViewTest(XBlockHandlerTestCase):
             'student-training',
             'self-assessment',
             'peer-assessment',
+            'ai-assessment',
             'staff-assessment'
         ])
 
@@ -322,8 +325,23 @@ class StudioViewTest(XBlockHandlerTestCase):
             'student-training',
             'peer-assessment',
             'self-assessment',
+            'ai-assessment',
             'staff-assessment',
         ])
+
+    @scenario('data/basic_scenario.xml')
+    def test_ai_assessment_requires_text_response(self, xblock):
+        data = copy.deepcopy(self.UPDATE_EDITOR_DATA)
+        data['text_response'] = None
+        data['file_upload_response'] = 'required'
+        data['assessments'] = [{"name": "ai-assessment"}]
+        xblock.runtime.modulestore = MagicMock()
+        xblock.runtime.modulestore.has_published_version.return_value = False
+
+        resp = self.request(xblock, 'update_editor_context', json.dumps(data), response_format='json')
+
+        self.assertFalse(resp['success'])
+        self.assertIn('AI Assessment requires a text response', resp['msg'])
 
     def _assert_rendered_editor_order(self, xblock, expected_assessment_order):
         """

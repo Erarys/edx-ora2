@@ -7,6 +7,7 @@ from submissions.api import get_submissions, SubmissionInternalError, Submission
 from openassessment.assessment.api.peer import PeerGradingStrategy
 from openassessment.workflow import api as workflow_api
 from openassessment.workflow.models import AssessmentWorkflowCancellation
+from openassessment.xblock.utils.data_conversion import create_rubric_dict
 
 
 class WorkflowMixin:
@@ -20,6 +21,7 @@ class WorkflowMixin:
         "self-assessment": "self",
         "peer-assessment": "peer",
         "student-training": "training",
+        "ai-assessment": "ai",
         "staff-assessment": "staff"
     }
 
@@ -53,7 +55,12 @@ class WorkflowMixin:
 
         """
         steps = self._create_step_list()
-        workflow_api.create_workflow(submission_uuid, steps, on_init_params={})
+        on_init_params = {}
+        if "ai" in steps:
+            on_init_params["ai"] = {
+                "rubric": create_rubric_dict(self.prompts, self.rubric_criteria_with_labels),
+            }
+        workflow_api.create_workflow(submission_uuid, steps, on_init_params=on_init_params)
 
     def workflow_requirements(self):
         """

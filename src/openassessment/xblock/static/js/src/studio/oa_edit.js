@@ -5,6 +5,7 @@ import EditScheduleView from './oa_edit_schedule';
 import Notifier from './oa_edit_notifier';
 import {
   EditSelfAssessmentView,
+  EditAIAssessmentView,
   EditStaffAssessmentView,
   EditStudentTrainingView,
   EditPeerAssessmentView,
@@ -66,6 +67,9 @@ export class StudioView {
     const staffAssessmentView = new EditStaffAssessmentView(
       $('#oa_staff_assessment_editor', this.element).get(0),
     );
+    const aiAssessmentView = new EditAIAssessmentView(
+      $('#oa_ai_assessment_editor', this.element).get(0),
+    );
     const studentTrainingView = new EditStudentTrainingView(
       $('#oa_student_training_editor', this.element).get(0),
     );
@@ -79,6 +83,7 @@ export class StudioView {
     );
     const assessmentLookupDictionary = {};
     assessmentLookupDictionary[staffAssessmentView.getID()] = staffAssessmentView;
+    assessmentLookupDictionary[aiAssessmentView.getID()] = aiAssessmentView;
     assessmentLookupDictionary[studentTrainingView.getID()] = studentTrainingView;
     assessmentLookupDictionary[peerAssessmentView.getID()] = peerAssessmentView;
     assessmentLookupDictionary[selfAssessmentView.getID()] = selfAssessmentView;

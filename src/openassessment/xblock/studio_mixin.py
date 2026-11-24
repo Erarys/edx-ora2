@@ -248,15 +248,24 @@ class StudioMixin:
 
         # Check that the editor assessment order contains all the assessments.
         current_order = set(data['editor_assessments_order'])
-        if set(DEFAULT_EDITOR_ASSESSMENTS_ORDER) != current_order:
-            # Backwards compatibility: "staff-assessment" may not be present.
-            # If that is the only problem with this data, just add it manually and continue.
-            if set(DEFAULT_EDITOR_ASSESSMENTS_ORDER) == current_order | {'staff-assessment'}:
-                data['editor_assessments_order'].append('staff-assessment')
-                logger.info('Backwards compatibility: editor_assessments_order now contains staff-assessment')
-            else:
+        expected_order = set(DEFAULT_EDITOR_ASSESSMENTS_ORDER)
+        if expected_order != current_order:
+            unexpected = current_order - expected_order
+            missing = expected_order - current_order
+            backwards_compatible_missing = {'staff-assessment', 'ai-assessment'}
+            if unexpected or missing - backwards_compatible_missing:
                 logger.exception('editor_assessments_order does not contain all expected assessment types')
                 return {'success': False, 'msg': self._('Error updating XBlock configuration')}
+
+            # Backwards compatibility: staff and AI assessment may not be present in editor data
+            # created before those assessment types were added.
+            for assessment_name in DEFAULT_EDITOR_ASSESSMENTS_ORDER:
+                if assessment_name in missing:
+                    data['editor_assessments_order'].append(assessment_name)
+                    logger.info(
+                        'Backwards compatibility: editor_assessments_order now contains %s',
+                        assessment_name,
+                    )
 
         if not data['text_response'] and not data['file_upload_response']:
             return {
@@ -269,6 +278,13 @@ class StudioMixin:
         if not data['file_upload_response'] and data['text_response'] == 'optional':
             return {'success': False,
                     'msg': self._("Error: When File Upload Response is disabled, Text Response must be Required")}
+
+        has_ai_assessment = any(step['name'] == 'ai-assessment' for step in data['assessments'])
+        if has_ai_assessment and data['text_response'] != 'required':
+            return {
+                'success': False,
+                'msg': self._("Error: AI Assessment requires a text response."),
+            }
 
         # Backwards compatibility: We used to treat "name" as both a user-facing label
         # and a unique identifier for criteria and options.

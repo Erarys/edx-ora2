@@ -259,7 +259,7 @@ class TestAssessmentStepsSerializer(XBlockHandlerTestCase):
     def test_order(self, xblock):
         # Given a basic setup
         expected_order = ["peer", "self"]
-        expected_step_keys = {"studentTraining", "peer", "self", "staff"}
+        expected_step_keys = {"studentTraining", "peer", "self", "ai", "staff"}
 
         # When I ask for assessment step config
         steps_config = AssessmentStepsSerializer(xblock).data

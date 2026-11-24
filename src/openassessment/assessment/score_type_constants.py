@@ -5,6 +5,7 @@ from django.utils.translation import gettext as _
 PEER_TYPE = "PE"
 SELF_TYPE = "SE"
 STAFF_TYPE = "ST"
+AI_TYPE = "AI"
 
 
 def score_type_to_string(score_type: str) -> str:
@@ -21,5 +22,6 @@ def score_type_to_string(score_type: str) -> str:
         PEER_TYPE: _("Peer"),
         SELF_TYPE: _("Self"),
         STAFF_TYPE: _("Staff"),
+        AI_TYPE: _("AI"),
     }
     return SCORE_TYPE_MAP.get(score_type, _("Unknown"))

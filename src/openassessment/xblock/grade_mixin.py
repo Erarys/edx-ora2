@@ -11,7 +11,7 @@ from xblock.core import XBlock
 from django.utils.translation import gettext as _
 from openassessment.assessment.api.peer import get_peer_grading_strategy, PeerGradingStrategy
 
-from openassessment.assessment.errors import PeerAssessmentError, SelfAssessmentError
+from openassessment.assessment.errors import AIAssessmentError, PeerAssessmentError, SelfAssessmentError
 
 from .utils.data_conversion import create_submission_dict
 
@@ -74,7 +74,7 @@ class GradeMixin:
                 path = 'legacy/grade/oa_grade_not_started.html'
             else:  # status is 'self' or 'peer', which implies that the workflow is incomplete
                 path, context = self.render_grade_incomplete(workflow)
-        except (sub_api.SubmissionError, PeerAssessmentError, SelfAssessmentError):
+        except (sub_api.SubmissionError, AIAssessmentError, PeerAssessmentError, SelfAssessmentError):
             return self.render_error(self._("An unexpected error occurred."))
         else:
             return self.render_assessment(path, context)
@@ -93,6 +93,7 @@ class GradeMixin:
         from submissions import api as sub_api
 
         from openassessment.assessment.api import peer as peer_api
+        from openassessment.assessment.api import ai as ai_api
         from openassessment.assessment.api import self as self_api
         from openassessment.assessment.api import staff as staff_api
 
@@ -101,6 +102,7 @@ class GradeMixin:
         submission_uuid = workflow['submission_uuid']
 
         staff_assessment = None
+        ai_assessment = None
         self_assessment = None
         feedback = None
         peer_assessments = []
@@ -122,6 +124,11 @@ class GradeMixin:
         if "self-assessment" in assessment_steps:
             self_assessment = self._assessment_grade_context(
                 self_api.get_assessment(submission_uuid)
+            )
+
+        if "ai-assessment" in assessment_steps:
+            ai_assessment = self._assessment_grade_context(
+                ai_api.get_latest_assessment(submission_uuid)
             )
 
         raw_staff_assessment = staff_api.get_latest_staff_assessment(submission_uuid)
@@ -151,6 +158,7 @@ class GradeMixin:
                 peer_assessments=peer_assessments,
                 self_assessment=self_assessment,
                 staff_assessment=staff_assessment,
+                ai_assessment=ai_assessment,
             ),
             'file_upload_type': self.file_upload_type,
             'allow_multiple_files': self.allow_multiple_files,
@@ -234,7 +242,7 @@ class GradeMixin:
 
     def grade_details(  # pylint: disable=too-many-positional-arguments
             self, submission_uuid, peer_assessments, self_assessment, staff_assessment,
-            is_staff=False
+            is_staff=False, ai_assessment=None
     ):
         # pylint: disable=unicode-format-string
         """
@@ -272,6 +280,7 @@ class GradeMixin:
         """
         # Import is placed here to avoid model import at project startup.
         from openassessment.assessment.api import peer as peer_api
+        from openassessment.assessment.api import ai as ai_api
         from openassessment.assessment.api import self as self_api
         from openassessment.assessment.api import staff as staff_api
 
@@ -301,6 +310,8 @@ class GradeMixin:
         assessment_steps = self.assessment_steps
         if staff_assessment:
             median_scores = staff_api.get_assessment_scores_by_criteria(submission_uuid)
+        elif "ai-assessment" in assessment_steps:
+            median_scores = ai_api.get_assessment_scores_by_criteria(submission_uuid)
         elif "peer-assessment" in assessment_steps:
             median_scores = peer_api.get_assessment_scores_with_grading_strategy(
                 submission_uuid,
@@ -319,6 +330,7 @@ class GradeMixin:
                 staff_assessment,
                 peer_assessments,
                 self_assessment,
+                ai_assessment=ai_assessment,
                 is_staff=is_staff,
             )
 
@@ -341,12 +353,13 @@ class GradeMixin:
                 staff_assessment=staff_assessment,
                 peer_assessments=peer_assessments,
                 self_assessment=self_assessment,
+                ai_assessment=ai_assessment,
             ),
         }
 
     def _graded_assessments(  # pylint: disable=too-many-positional-arguments
             self, submission_uuid, criterion, assessment_steps, staff_assessment, peer_assessments,
-            self_assessment, is_staff=False
+            self_assessment, ai_assessment=None, is_staff=False
     ):
         """
         Returns an array of assessments with their associated grades.
@@ -370,6 +383,12 @@ class GradeMixin:
             _('Staff Comments'),
             criterion_name,
             staff_assessment
+        )
+        ai_assessment_part = _get_assessment_part(
+            _('AI Grade'),
+            _('AI Comments'),
+            criterion_name,
+            ai_assessment,
         )
         if "peer-assessment" in assessment_steps:
             peer_assessment_part = {
@@ -401,6 +420,8 @@ class GradeMixin:
         assessments = []
         if staff_assessment_part:
             assessments.append(staff_assessment_part)
+        if ai_assessment_part:
+            assessments.append(ai_assessment_part)
         if peer_assessment_part:
             assessments.append(peer_assessment_part)
         if self_assessment_part:
@@ -515,7 +536,7 @@ class GradeMixin:
             'explanation': None,
         }
 
-    def _additional_feedback(self, staff_assessment, peer_assessments, self_assessment):
+    def _additional_feedback(self, staff_assessment, peer_assessments, self_assessment, ai_assessment=None):
         """
         Returns an array of additional feedback for the specified assessments.
 
@@ -534,6 +555,13 @@ class GradeMixin:
                 additional_feedback.append({
                     'title': _('Staff Comments'),
                     'feedback': feedback
+                })
+        if ai_assessment:
+            feedback = ai_assessment.get('feedback')
+            if feedback:
+                additional_feedback.append({
+                    'title': _('AI Comments'),
+                    'feedback': feedback,
                 })
         if peer_assessments and len(peer_assessments) >= self.workflow_requirements()['peer']['must_be_graded_by']:
             individual_feedback = []
@@ -628,7 +656,7 @@ class GradeMixin:
         Args:
             workflow (dict): The serialized Workflow model.
         Returns:
-            str: Type of decisive assessment. Possible values are self, staff, peer.
+            str: Type of decisive assessment. Possible values are self, staff, peer, or ai.
         """
         score = workflow['score']
         complete = score is not None
@@ -675,6 +703,7 @@ class GradeMixin:
         assessment_type = self._get_assessment_type(workflow)
         sentences = {
             "staff": _("The grade for this problem is determined by your Staff Grade."),
+            "ai": _("The grade for this problem is determined by the AI assessment of your response."),
             "peer": self._get_peer_explanation_sentence(
                 get_peer_grading_strategy(self.workflow_requirements())
             ),

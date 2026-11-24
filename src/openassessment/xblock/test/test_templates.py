@@ -15,7 +15,8 @@ class TemplatesMixin(TestCase):
 
     def test_templates(self):
         templates = self.block.templates()
-        self.assertEqual(len(templates), 5)
+        self.assertEqual(len(templates), 6)
+        self.assertIn('ai-assessment', {template['template_id'] for template in templates})
         for template in templates:
             self.assertIsInstance(template, dict)
             self.assertIn('template_id', template)

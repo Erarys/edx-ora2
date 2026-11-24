@@ -199,11 +199,16 @@ class StaffSettingsSerializer(AssessmentStepSettingsSerializer):
     STEP_NAME = 'staff-assessment'
 
 
+class AISettingsSerializer(AssessmentStepSettingsSerializer):
+    STEP_NAME = 'ai-assessment'
+
+
 class AssessmentStepsSettingsSerializer(Serializer):
     studentTraining = StudentTrainingSettingsSerializer(source="*")
     peer = PeerSettingsSerializer(source="*")
     # Workaround to allow reserved keyword in serializer key
     vars()["self"] = SelfSettingsSerializer(source='*')
+    ai = AISettingsSerializer(source='*')
     staff = StaffSettingsSerializer(source='*')
 
 

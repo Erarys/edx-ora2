@@ -7,4 +7,4 @@ FILE_DELETE = 'delete'
 ASSESSMENT_SUBMIT = 'submit'
 FILE_UPLOAD_CALLBACK = 'upload_response'
 
-STEP_SUFFIXES = ("submission", "peer", "studentTraining", "self", "staff", "done")
+STEP_SUFFIXES = ("submission", "peer", "studentTraining", "self", "ai", "staff", "done")

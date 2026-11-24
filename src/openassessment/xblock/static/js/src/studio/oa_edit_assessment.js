@@ -676,3 +676,55 @@ export class EditStaffAssessmentView {
     // do nothing
   }
 }
+
+/**
+ * Interface for enabling AI assessment.
+ */
+export class EditAIAssessmentView {
+  constructor(element) {
+    this.element = element;
+    this.name = 'ai-assessment';
+
+    new ToggleControl(
+      $('#include_ai_assessment', this.element),
+      [
+        $('.openassessment_assessment_module_editor', this.element),
+      ],
+      [
+        $('.openassessment_assessment_module_editor', this.element),
+      ],
+      new Notifier([
+        new AssessmentToggleListener(),
+      ]),
+    ).install();
+  }
+
+  description() {
+    return {};
+  }
+
+  isEnabled(isEnabled) {
+    const selector = $('#include_ai_assessment', this.element);
+    return Fields.booleanField(selector, isEnabled);
+  }
+
+  toggleEnabled() {
+    $('#include_ai_assessment', this.element).click();
+  }
+
+  getID() {
+    return $(this.element).attr('id');
+  }
+
+  validate() {
+    return true;
+  }
+
+  validationErrors() {
+    return [];
+  }
+
+  clearValidationErrors() {
+    // Nothing to clear.
+  }
+}
